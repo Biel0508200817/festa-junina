@@ -9,13 +9,17 @@ app.use(express.json());
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Rota de Boas-vindas
-app.get('/api', (req, res) => {
-    res.json({ mensagem: '🔥 Bem-vindo à API do Arraiá na Vercel! O quentão tá no fogo! 🔥' });
+// ==========================================
+// 🔥 ROTAS ATUALIZADAS 🔥
+// ==========================================
+
+// Rota Raiz (Agora funciona direto no link principal da Vercel!)
+app.get('/', (req, res) => {
+    res.status(200).json({ mensagem: '🔥 O Arraiá tá ON na Vercel! 🔥' });
 });
 
-// Rota 1: Listar todo o cardápio
-app.get('/api/produtos', async (req, res) => {
+// Rota de Produtos
+app.get('/produtos', async (req, res) => {
     const { data, error } = await supabase
         .from('produtos')
         .select('*')
@@ -28,8 +32,8 @@ app.get('/api/produtos', async (req, res) => {
     res.status(200).json(data);
 });
 
-// Rota 2: Adicionar um novo produto (POST)
-app.post('/api/produtos', async (req, res) => {
+// Rota de Adicionar Produto
+app.post('/produtos', async (req, res) => {
     const { nome, descricao, preco } = req.body;
 
     const { data, error } = await supabase
@@ -44,5 +48,4 @@ app.post('/api/produtos', async (req, res) => {
     res.status(201).json({ mensagem: 'Produto adicionado com sucesso!', produto: data });
 });
 
-// EXPORTAR O APP (Obrigatório para a Vercel)
 module.exports = app;
