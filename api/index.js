@@ -127,50 +127,51 @@ app.get('/configuracoes', async (req, res) => {
 // CATEGORIAS
 // ========================================
 
-app.get('/categorias', async (req, res) => {
+app.get('/categorias/:id', async (req, res) => {
 
-  const { data, error } = await supabase
-    .from('categorias')
-    .select('*')
-    .order('id');
+  try {
 
-  if (error) {
-    return res.status(500).json({
-      error: error.message
+    const id = Number(req.params.id);
+
+    const categorias = {
+      1: 'salgados',
+      2: 'doces',
+      3: 'bebidas'
+    };
+
+    const categoria = categorias[id];
+
+    if (!categoria) {
+      return res.status(404).json({
+        error: 'Categoria não encontrada'
+      });
+    }
+
+    // BUSCA NO SUPABASE
+    const { data, error } = await supabase
+      .from('produtos')
+      .select('*')
+      .ilike('categoria', categoria);
+
+    if (error) {
+      return res.status(500).json({
+        error: error.message
+      });
+    }
+
+    res.json({
+      categoria,
+      total: data.length,
+      produtos: data
     });
-  }
 
-  res.json(data);
+  } catch (err) {
 
-});
-
-app.get('/categorias/:id', (req, res) => {
-
-  const id = Number(req.params.id);
-
-  const categorias = {
-    1: 'salgados',
-    2: 'doces',
-    3: 'bebidas'
-  };
-
-  const categoria = categorias[id];
-
-  if (!categoria) {
-    return res.status(404).json({
-      error: 'Categoria não encontrada'
+    res.status(500).json({
+      error: err.message
     });
+
   }
-
-  const produtosCategoria = produtos.filter(produto =>
-    produto.categoria.toLowerCase() === categoria
-  );
-
-  res.json({
-    categoria,
-    total: produtosCategoria.length,
-    produtos: produtosCategoria
-  });
 
 });
 
