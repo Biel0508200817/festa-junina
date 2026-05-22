@@ -127,6 +127,36 @@ app.get('/configuracoes', async (req, res) => {
 // CATEGORIAS
 // ========================================
 
+
+app.get('/categorias', async (req, res) => {
+
+  try {
+
+    const { data, error } = await supabase
+      .from('categorias')
+      .select('*')
+      .order('id', { ascending: true });
+
+    if (error) {
+      return res.status(500).json({
+        error: error.message
+      });
+    }
+
+    res.json({
+      total: data.length,
+      categorias: data
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
 app.get('/categorias/:id', async (req, res) => {
 
   try {
