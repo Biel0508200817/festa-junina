@@ -133,36 +133,35 @@ app.get('/categorias/:id', async (req, res) => {
 
     const id = Number(req.params.id);
 
-    const categorias = {
-      1: 'salgados',
-      2: 'doces',
-      3: 'bebidas'
-    };
+    // BUSCA A CATEGORIA
+    const { data: categoria, error: categoriaError } = await supabase
+      .from('categorias')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    const categoria = categorias[id];
-
-    if (!categoria) {
+    if (categoriaError || !categoria) {
       return res.status(404).json({
         error: 'Categoria não encontrada'
       });
     }
 
-    // BUSCA NO SUPABASE
-    const { data, error } = await supabase
+    // BUSCA PRODUTOS DA CATEGORIA
+    const { data: produtos, error: produtosError } = await supabase
       .from('produtos')
       .select('*')
-      .ilike('categoria', categoria);
+      .eq('categoria_id', id);
 
-    if (error) {
+    if (produtosError) {
       return res.status(500).json({
-        error: error.message
+        error: produtosError.message
       });
     }
 
     res.json({
       categoria,
-      total: data.length,
-      produtos: data
+      total: produtos.length,
+      produtos
     });
 
   } catch (err) {
@@ -174,7 +173,6 @@ app.get('/categorias/:id', async (req, res) => {
   }
 
 });
-
 
 // ========================================
 // PRODUTOS
