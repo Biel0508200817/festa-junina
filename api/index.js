@@ -144,6 +144,36 @@ app.get('/categorias', async (req, res) => {
 
 });
 
+app.get('/categorias/:id', (req, res) => {
+
+  const id = Number(req.params.id);
+
+  const categorias = {
+    1: 'salgados',
+    2: 'doces',
+    3: 'bebidas'
+  };
+
+  const categoria = categorias[id];
+
+  if (!categoria) {
+    return res.status(404).json({
+      error: 'Categoria não encontrada'
+    });
+  }
+
+  const produtosCategoria = produtos.filter(produto =>
+    produto.categoria.toLowerCase() === categoria
+  );
+
+  res.json({
+    categoria,
+    total: produtosCategoria.length,
+    produtos: produtosCategoria
+  });
+
+});
+
 
 // ========================================
 // PRODUTOS
